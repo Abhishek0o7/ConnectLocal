@@ -9,6 +9,7 @@ type ChatSummary = {
   friend: Pick<Profile, "id" | "name" | "initials" | "avatar_bg" | "avatar_fg" | "last_seen">;
   lastMessage: Message | null;
   unread: boolean;
+  streak: number;
 };
 
 export default function ChatListPage() {
@@ -25,13 +26,18 @@ export default function ChatListPage() {
 
     const { data: connections } = await supabase
       .from("connections")
-      .select("requester_id, addressee_id")
+      .select("requester_id, addressee_id, streak_count")
       .eq("status", "accepted")
       .or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`);
 
     const friendIds = (connections ?? []).map((c) =>
       c.requester_id === user.id ? c.addressee_id : c.requester_id
     );
+    const streakByFriend = new Map<string, number>();
+    (connections ?? []).forEach((c) => {
+      const fid = c.requester_id === user.id ? c.addressee_id : c.requester_id;
+      streakByFriend.set(fid, c.streak_count ?? 0);
+    });
 
     if (friendIds.length === 0) {
       setChats([]);
@@ -65,7 +71,7 @@ export default function ChatListPage() {
       );
       const lastMessage = convo.length ? convo[convo.length - 1] : null;
       const unread = convo.some((m) => m.receiver_id === user.id && !m.read_at);
-      return { friend, lastMessage, unread };
+      return { friend, lastMessage, unread, streak: streakByFriend.get(friend.id) ?? 0 };
     });
 
     summaries.sort((a, b) => {
@@ -96,7 +102,7 @@ export default function ChatListPage() {
   if (chats.length === 0) {
     return (
       <div className="text-center px-6 py-12">
-        <div className="w-14 h-14 bg-[#f0f0f8] rounded-full flex items-center justify-center mx-auto mb-3.5">
+        <div className="w-14 h-14 bg-surface2 rounded-full flex items-center justify-center mx-auto mb-3.5">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" strokeWidth="2">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
           </svg>
@@ -111,11 +117,11 @@ export default function ChatListPage() {
 
   return (
     <div className="flex flex-col">
-      {chats.map(({ friend, lastMessage, unread }) => (
+      {chats.map(({ friend, lastMessage, unread, streak }) => (
         <div
           key={friend.id}
           onClick={() => router.push(`/chat/${friend.id}`)}
-          className="flex items-center gap-3 px-[18px] py-3.5 border-b border-hairline cursor-pointer hover:bg-primary-light"
+          className="flex items-center gap-3 px-[18px] py-3.5 border-b border-hairline cursor-pointer hover:bg-surface2"
         >
           <div
             className="w-[46px] h-[46px] rounded-full flex items-center justify-center text-sm font-semibold font-display flex-shrink-0"
@@ -124,7 +130,15 @@ export default function ChatListPage() {
             {friend.initials}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium font-display text-ink">{friend.name}</div>
+            <div className="text-sm font-medium font-display text-ink flex items-center gap-1.5">
+              {friend.name}
+              {streak >= 2 && (
+                <span className="text-[11px] font-normal font-sans flex items-center gap-0.5">
+                  <span className="flame-flicker">🔥</span>
+                  <span className="text-yellow">{streak}</span>
+                </span>
+              )}
+            </div>
             <div className="text-xs text-muted mt-0.5 truncate">
               {lastMessage ? lastMessage.content : "Say hi to your new neighbor!"}
             </div>

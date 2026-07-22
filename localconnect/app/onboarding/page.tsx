@@ -73,7 +73,7 @@ export default function OnboardingPage() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-2xl font-semibold text-ink">Set up your profile</h1>
+          <h1 className="font-display text-2xl font-semibold text-gradient">Set up your profile</h1>
           <p className="text-muted text-sm mt-1">
             This helps us show you people and events actually nearby.
           </p>
@@ -86,14 +86,14 @@ export default function OnboardingPage() {
             placeholder="Neighborhood / area (e.g. Green Park)"
             value={area}
             onChange={(e) => setArea(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           <input
             type="text"
             placeholder="Interests, comma separated (e.g. Yoga, Cooking)"
             value={interests}
             onChange={(e) => setInterests(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
 
           <div className="bg-primary-light rounded-xl p-4 text-sm">
@@ -107,7 +107,7 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={requestLocation}
-                  className="bg-primary text-white rounded-full px-4 py-2 text-xs font-medium"
+                  className="bg-aurora text-white rounded-full px-4 py-2 text-xs font-medium"
                 >
                   {locStatus === "requesting" ? "Requesting…" : "Enable location"}
                 </button>
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-primary text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
+            className="bg-aurora text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
           >
             {saving ? "Saving…" : "Continue"}
           </button>

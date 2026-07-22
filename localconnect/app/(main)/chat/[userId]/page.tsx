@@ -108,7 +108,7 @@ export default function ChatConversationPage() {
 
   return (
     <div className="fixed inset-0 bg-bg flex flex-col z-30">
-      <div className="bg-primary px-4 pt-5 pb-3 flex items-center gap-3 flex-shrink-0">
+      <div className="bg-aurora px-4 pt-5 pb-3 flex items-center gap-3 flex-shrink-0">
         <button onClick={() => router.push("/chat")} className="text-white flex items-center gap-1">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
             <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -131,10 +131,10 @@ export default function ChatConversationPage() {
         {messages.map((m) => (
           <div
             key={m.id}
-            className={`max-w-[75%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
+            className={`max-w-[75%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed pop-in ${
               m.sender_id === me
-                ? "bg-primary text-white self-end rounded-br-md"
-                : "bg-white text-ink self-start rounded-bl-md border border-hairline"
+                ? "bg-aurora text-white self-end rounded-br-md"
+                : "glass bg-surface/60 text-ink self-start rounded-bl-md border border-hairline"
             }`}
           >
             <div>{m.content}</div>
@@ -144,18 +144,18 @@ export default function ChatConversationPage() {
       </div>
 
       {canMessage ? (
-        <div className="p-3 bg-white border-t border-hairline flex gap-2.5 items-center flex-shrink-0">
+        <div className="p-3 glass bg-surface/80 border-t border-hairline flex gap-2.5 items-center flex-shrink-0">
           <input
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message…"
-            className="flex-1 bg-primary-light border-none rounded-full px-4 py-2.5 text-sm outline-none text-ink"
+            className="flex-1 bg-surface2 border-none rounded-full px-4 py-2.5 text-sm outline-none text-ink"
           />
           <button
             onClick={handleSend}
-            className="bg-primary text-white border-none rounded-full w-[38px] h-[38px] flex items-center justify-center flex-shrink-0"
+            className="bg-aurora text-white border-none rounded-full w-[38px] h-[38px] flex items-center justify-center flex-shrink-0"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
@@ -163,7 +163,7 @@ export default function ChatConversationPage() {
           </button>
         </div>
       ) : (
-        <div className="p-4 text-center text-xs text-muted bg-white border-t border-hairline">
+        <div className="p-4 text-center text-xs text-muted glass bg-surface/80 border-t border-hairline">
           You can message once you're both connected.
         </div>
       )}

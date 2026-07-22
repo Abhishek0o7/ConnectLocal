@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-2xl font-semibold text-ink">LocalConnect</h1>
+          <h1 className="font-display text-2xl font-semibold text-gradient">LocalConnect</h1>
           <p className="text-muted text-sm mt-1">Meet people near you.</p>
         </div>
 
@@ -42,7 +42,7 @@ export default function LoginPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           <input
             type="password"
@@ -50,13 +50,13 @@ export default function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           {error && <p className="text-red text-xs">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="bg-primary text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
+            className="bg-aurora text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
           >
             {loading ? "Signing in…" : "Log in"}
           </button>
@@ -64,7 +64,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-muted mt-6">
           New here?{" "}
-          <Link href="/signup" className="text-primary font-medium">
+          <Link href="/signup" className="text-gradient font-semibold">
             Create an account
           </Link>
         </p>

@@ -64,13 +64,13 @@ export default function Header() {
   const showSearch = ["/people", "/feed", "/events"].includes(basePath);
 
   return (
-    <div className="bg-primary px-5 pt-6 pb-4 sticky top-0 z-10">
+    <div className="bg-aurora px-5 pt-6 pb-4 sticky top-0 z-10">
       <div className="flex items-center justify-between mb-1">
         <div>
           <div className="font-display text-xl font-semibold text-white -tracking-wide">
             LocalConnect
           </div>
-          <div className="text-xs text-white/65">{subtitle}</div>
+          <div className="text-xs text-white/70">{subtitle}</div>
         </div>
         <div className="flex gap-2">
           <Link

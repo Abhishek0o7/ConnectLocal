@@ -193,32 +193,32 @@ export default function EventsPage() {
 
       <button
         onClick={() => setCreatorOpen((o) => !o)}
-        className="bg-primary text-white border-none rounded-full py-2.5 text-sm font-medium mx-[18px] mb-2.5 block w-[calc(100%-36px)]"
+        className="bg-aurora text-white border-none rounded-full py-2.5 text-sm font-medium mx-[18px] mb-2.5 block w-[calc(100%-36px)]"
       >
         + Host an event
       </button>
 
       {creatorOpen && (
-        <div className="bg-white border border-hairline rounded-card mx-[18px] mb-3 p-4 flex flex-col gap-2.5">
+        <div className="bg-surface border border-hairline rounded-card mx-[18px] mb-3 p-4 flex flex-col gap-2.5">
           <input
             type="text"
             placeholder="Event title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
+            className="bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
           />
           <div className="flex gap-2">
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="flex-1 bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
+              className="flex-1 bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
             />
             <input
               type="time"
               value={time}
               onChange={(e) => setTime(e.target.value)}
-              className="flex-1 bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
+              className="flex-1 bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
             />
           </div>
           <input
@@ -226,19 +226,19 @@ export default function EventsPage() {
             placeholder="Location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className="bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
+            className="bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none text-ink"
           />
           <textarea
             placeholder="Tell people about your event…"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none resize-none h-16 text-ink"
+            className="bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none resize-none h-16 text-ink"
           />
           {formError && <p className="text-red text-xs">{formError}</p>}
           <button
             onClick={handleCreateEvent}
             disabled={saving}
-            className="bg-primary text-white border-none rounded-full py-2.5 text-sm font-medium disabled:opacity-60"
+            className="bg-aurora text-white border-none rounded-full py-2.5 text-sm font-medium disabled:opacity-60"
           >
             {saving ? "Creating…" : "Create event"}
           </button>
@@ -266,13 +266,13 @@ export default function EventsPage() {
                 <div className="flex gap-1.5">
                   <button
                     onClick={() => handleAcceptRequest(r.id)}
-                    className="bg-primary text-white border-none rounded-full px-3 py-1 text-[11px] font-medium"
+                    className="bg-aurora text-white border-none rounded-full px-3 py-1 text-[11px] font-medium"
                   >
                     Accept
                   </button>
                   <button
                     onClick={() => handleDeclineRequest(r.id)}
-                    className="bg-transparent text-muted border border-black/15 rounded-full px-2.5 py-1 text-[11px]"
+                    className="bg-transparent text-muted border border-white/15 rounded-full px-2.5 py-1 text-[11px]"
                   >
                     Decline
                   </button>

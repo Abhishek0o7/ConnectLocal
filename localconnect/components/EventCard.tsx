@@ -16,11 +16,11 @@ export default function EventCard({
   const timeLabel = start.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
   return (
-    <div className="bg-white border border-hairline rounded-card p-4">
+    <div className="glass bg-surface/60 border border-hairline rounded-card p-4 pop-in">
       <div className="flex items-start gap-3 mb-3">
-        <div className="bg-primary text-white rounded-xl px-3 py-2 text-center flex-shrink-0 font-display">
+        <div className="bg-aurora text-white rounded-xl px-3 py-2 text-center flex-shrink-0 font-display">
           <div className="text-[22px] font-semibold leading-none">{day}</div>
-          <div className="text-[10px] opacity-80 mt-0.5">{month}</div>
+          <div className="text-[10px] opacity-90 mt-0.5">{month}</div>
         </div>
         <div className="flex-1">
           <div className="font-display text-sm font-semibold text-ink">{event.title}</div>
@@ -58,7 +58,7 @@ export default function EventCard({
           <div className="text-xs text-primary-dark flex-1 leading-snug">Send a request to join this event</div>
           <button
             onClick={() => onRequestJoin(event.id)}
-            className="bg-primary text-white border-none rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap"
+            className="bg-aurora text-white border-none rounded-full px-4 py-2 text-xs font-medium whitespace-nowrap"
           >
             Request to join
           </button>

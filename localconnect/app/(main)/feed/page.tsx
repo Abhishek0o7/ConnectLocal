@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { PostTag, PostWithMeta } from "@/lib/types/db";
+import type { PostTag, PostWithMeta, ReactionCounts, ReactionEmoji } from "@/lib/types/db";
 import PostCard from "@/components/PostCard";
 
 export default function FeedPage() {
@@ -43,8 +43,8 @@ export default function FeedPage() {
       .select(
         `id, author_id, tag, content, created_at,
          author:profiles!posts_author_id_fkey(id, name, initials, avatar_bg, avatar_fg),
-         post_likes(user_id),
-         post_comments(count)`
+         post_reactions(user_id, emoji),
+         post_comments(id, post_id, author_id, content, created_at, author:profiles!post_comments_author_id_fkey(id, name, initials, avatar_bg, avatar_fg))`
       )
       .order("created_at", { ascending: false })
       .limit(50);
@@ -55,17 +55,31 @@ export default function FeedPage() {
       return;
     }
 
-    const mapped: PostWithMeta[] = (data ?? []).map((row: any) => ({
-      id: row.id,
-      author_id: row.author_id,
-      tag: row.tag,
-      content: row.content,
-      created_at: row.created_at,
-      author: row.author,
-      like_count: row.post_likes?.length ?? 0,
-      liked_by_me: (row.post_likes ?? []).some((l: any) => l.user_id === user.id),
-      comment_count: row.post_comments?.[0]?.count ?? 0,
-    }));
+    const mapped: PostWithMeta[] = (data ?? []).map((row: any) => {
+      const comments = (row.post_comments ?? []).slice().sort(
+        (a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+      const reactions = row.post_reactions ?? [];
+      const reaction_counts: ReactionCounts = {};
+      reactions.forEach((r: any) => {
+        reaction_counts[r.emoji as ReactionEmoji] = (reaction_counts[r.emoji as ReactionEmoji] ?? 0) + 1;
+      });
+      const mine = reactions.find((r: any) => r.user_id === user.id);
+      return {
+        id: row.id,
+        author_id: row.author_id,
+        tag: row.tag,
+        content: row.content,
+        created_at: row.created_at,
+        author: row.author,
+        like_count: reactions.length,
+        liked_by_me: !!mine,
+        reaction_counts,
+        my_reaction: mine?.emoji ?? null,
+        comment_count: comments.length,
+        comments,
+      };
+    });
 
     setPosts(mapped);
     setLoading(false);
@@ -75,23 +89,27 @@ export default function FeedPage() {
     load();
   }, [load]);
 
-  async function handleToggleLike(postId: string) {
+  async function handleReact(postId: string, emoji: ReactionEmoji) {
     if (!me) return;
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
+    const previous = post.my_reaction;
+    const isRemoving = previous === emoji;
 
     setPosts((prev) =>
-      prev.map((p) =>
-        p.id === postId
-          ? { ...p, liked_by_me: !p.liked_by_me, like_count: p.like_count + (p.liked_by_me ? -1 : 1) }
-          : p
-      )
+      prev.map((p) => {
+        if (p.id !== postId) return p;
+        const counts = { ...p.reaction_counts };
+        if (previous) counts[previous] = Math.max(0, (counts[previous] ?? 0) - 1);
+        if (!isRemoving) counts[emoji] = (counts[emoji] ?? 0) + 1;
+        return { ...p, reaction_counts: counts, my_reaction: isRemoving ? null : emoji };
+      })
     );
 
-    if (post.liked_by_me) {
-      await supabase.from("post_likes").delete().eq("post_id", postId).eq("user_id", me);
+    if (isRemoving) {
+      await supabase.from("post_reactions").delete().eq("post_id", postId).eq("user_id", me);
     } else {
-      await supabase.from("post_likes").insert({ post_id: postId, user_id: me });
+      await supabase.from("post_reactions").upsert({ post_id: postId, user_id: me, emoji });
     }
   }
 
@@ -108,6 +126,58 @@ export default function FeedPage() {
     setDraft("");
     setComposerOpen(false);
     load();
+  }
+
+  async function handleAddComment(postId: string, content: string) {
+    if (!me) return;
+    const { data, error } = await supabase
+      .from("post_comments")
+      .insert({ post_id: postId, author_id: me, content })
+      .select(
+        "id, post_id, author_id, content, created_at, author:profiles!post_comments_author_id_fkey(id, name, initials, avatar_bg, avatar_fg)"
+      )
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? { ...p, comments: [...p.comments, data as any], comment_count: p.comment_count + 1 }
+          : p
+      )
+    );
+  }
+
+  async function handleDeleteComment(postId: string, commentId: string) {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId
+          ? {
+              ...p,
+              comments: p.comments.filter((c) => c.id !== commentId),
+              comment_count: p.comment_count - 1,
+            }
+          : p
+      )
+    );
+    const { error } = await supabase.from("post_comments").delete().eq("id", commentId);
+    if (error) {
+      console.error(error);
+      load();
+    }
+  }
+
+  async function handleDeletePost(postId: string) {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    if (error) {
+      console.error(error);
+      load();
+    }
   }
 
   const filtered = q
@@ -128,24 +198,24 @@ export default function FeedPage() {
 
       <button
         onClick={() => setComposerOpen((o) => !o)}
-        className="bg-primary text-white border-none rounded-full py-2.5 text-sm font-medium mx-[18px] mb-2.5 block w-[calc(100%-36px)]"
+        className="bg-aurora text-white border-none rounded-full py-2.5 text-sm font-medium mx-[18px] mb-2.5 block w-[calc(100%-36px)]"
       >
         + Share something
       </button>
 
       {composerOpen && (
-        <div className="bg-white border border-hairline rounded-card mx-[18px] mb-3 p-3.5">
+        <div className="glass bg-surface/60 border border-hairline rounded-card mx-[18px] mb-3 p-3.5 pop-in">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="What's on your mind?"
-            className="w-full bg-primary-light border-none rounded-xl px-3.5 py-2.5 text-sm outline-none resize-none h-20 text-ink"
+            className="w-full bg-surface2 border-none rounded-xl px-3.5 py-2.5 text-sm outline-none resize-none h-20 text-ink"
           />
           <div className="flex items-center gap-2 mt-2.5">
             <select
               value={tag}
               onChange={(e) => setTag(e.target.value as PostTag)}
-              className="flex-1 bg-primary-light border-none rounded-full px-3 py-1.5 text-xs outline-none text-ink"
+              className="flex-1 bg-surface2 border-none rounded-full px-3 py-1.5 text-xs outline-none text-ink"
             >
               <option value="general">General</option>
               <option value="help">Help</option>
@@ -156,7 +226,7 @@ export default function FeedPage() {
             <button
               onClick={handleSubmitPost}
               disabled={posting}
-              className="bg-primary text-white border-none rounded-full px-4.5 py-2 text-sm font-medium disabled:opacity-60"
+              className="bg-aurora text-white border-none rounded-full px-4.5 py-2 text-sm font-medium disabled:opacity-60"
             >
               {posting ? "Posting…" : "Post"}
             </button>
@@ -172,8 +242,13 @@ export default function FeedPage() {
           <PostCard
             key={post.id}
             post={post}
+            me={me}
             isFriend={friendIds.has(post.author_id)}
-            onToggleLike={handleToggleLike}
+            isOwner={post.author_id === me}
+            onReact={handleReact}
+            onAddComment={handleAddComment}
+            onDeleteComment={handleDeleteComment}
+            onDeletePost={handleDeletePost}
           />
         ))}
       </div>

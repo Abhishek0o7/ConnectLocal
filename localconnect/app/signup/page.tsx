@@ -51,12 +51,12 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-6 text-center">
         <div>
-          <h1 className="font-display text-xl font-semibold text-ink mb-2">Check your email</h1>
+          <h1 className="font-display text-xl font-semibold text-gradient mb-2">Check your email</h1>
           <p className="text-muted text-sm">
             We sent a confirmation link to <span className="text-ink">{email}</span>. Click it to
             activate your account, then log in.
           </p>
-          <Link href="/login" className="text-primary text-sm font-medium mt-6 inline-block">
+          <Link href="/login" className="text-gradient font-semibold text-sm mt-6 inline-block">
             Back to log in
           </Link>
         </div>
@@ -68,7 +68,7 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="font-display text-2xl font-semibold text-ink">Create your account</h1>
+          <h1 className="font-display text-2xl font-semibold text-gradient">Create your account</h1>
           <p className="text-muted text-sm mt-1">Join people near you.</p>
         </div>
 
@@ -79,7 +79,7 @@ export default function SignupPage() {
             placeholder="Full name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           <input
             type="email"
@@ -87,7 +87,7 @@ export default function SignupPage() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           <input
             type="password"
@@ -95,13 +95,13 @@ export default function SignupPage() {
             placeholder="Password (min. 8 characters)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-white border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary"
+            className="bg-surface2 border border-hairline rounded-xl px-4 py-3 text-sm outline-none focus:border-primary text-ink"
           />
           {error && <p className="text-red text-xs">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="bg-primary text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
+            className="bg-aurora text-white rounded-full py-3 text-sm font-medium disabled:opacity-60"
           >
             {loading ? "Creating account…" : "Sign up"}
           </button>
@@ -109,7 +109,7 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-muted mt-6">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary font-medium">
+          <Link href="/login" className="text-gradient font-semibold">
             Log in
           </Link>
         </p>

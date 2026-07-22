@@ -54,22 +54,27 @@ export default function BottomNav() {
   }, []);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-hairline flex items-center justify-around z-20">
+    <nav className="fixed bottom-3 left-3 right-3 h-16 glass bg-surface/80 border border-hairline rounded-[24px] flex items-center justify-around z-20 shadow-[0_8px_32px_rgba(0,0,0,0.35)]">
       {TABS.map((tab) => {
         const active = pathname?.startsWith(tab.href);
         return (
           <Link
             key={tab.key}
             href={tab.href}
-            className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl min-w-[64px] relative"
+            className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl min-w-[64px] relative transition-transform ${
+              active ? "scale-105" : ""
+            }`}
           >
+            {active && (
+              <span className="absolute inset-0 bg-aurora-soft rounded-xl -z-10 pop-in" />
+            )}
             <TabIcon tabKey={tab.key} active={!!active} />
             {tab.key === "chat" && unreadChats > 0 && (
               <span className="absolute top-0 right-2 bg-red text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-semibold">
                 {unreadChats > 9 ? "9+" : unreadChats}
               </span>
             )}
-            <span className={`text-[11px] font-display ${active ? "text-primary font-medium" : "text-muted"}`}>
+            <span className={`text-[11px] font-display ${active ? "text-gradient font-medium" : "text-muted"}`}>
               {tab.label}
             </span>
           </Link>

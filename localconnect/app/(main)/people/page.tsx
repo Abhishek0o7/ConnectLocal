@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { NearbyProfile } from "@/lib/types/db";
 import PersonCard from "@/components/PersonCard";
 import RequestsPanel from "@/components/RequestsPanel";
+import ConfettiBurst from "@/components/ConfettiBurst";
 
 type StatusMap = Record<string, "none" | "sent" | "friends">;
 
@@ -20,6 +21,7 @@ export default function PeoplePage() {
   const [statusMap, setStatusMap] = useState<StatusMap>({});
   const [incoming, setIncoming] = useState<(NearbyProfile & { connectionId: string })[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [celebration, setCelebration] = useState(0);
 
   const load = useCallback(async () => {
     const {
@@ -108,6 +110,7 @@ export default function PeoplePage() {
       .from("connections")
       .update({ status: "accepted", responded_at: new Date().toISOString() })
       .eq("id", connectionId);
+    setCelebration((c) => c + 1);
     load();
   }
 
@@ -119,7 +122,10 @@ export default function PeoplePage() {
     load();
   }
 
-  const visible = people.filter((p) => !incoming.some((i) => i.id === p.id));
+  const onlineOnly = people.filter(
+    (p) => Date.now() - new Date(p.last_seen).getTime() < 5 * 60 * 1000
+  );
+  const visible = onlineOnly.filter((p) => !incoming.some((i) => i.id === p.id));
   const filtered = q
     ? visible.filter(
         (p) => p.name.toLowerCase().includes(q) || p.area.toLowerCase().includes(q)
@@ -136,7 +142,7 @@ export default function PeoplePage() {
         <p className="text-sm text-muted mb-3">
           We need your location to show people nearby. Head to your profile to enable it.
         </p>
-        <a href="/onboarding" className="text-primary text-sm font-medium">
+        <a href="/onboarding" className="text-gradient text-sm font-semibold">
           Set up location
         </a>
       </div>
@@ -145,19 +151,22 @@ export default function PeoplePage() {
 
   return (
     <div>
+      <ConfettiBurst trigger={celebration} />
       <RequestsPanel requests={incoming} onAccept={handleAccept} onDecline={handleDecline} />
 
       <div className="px-[18px] pt-4 pb-2 flex items-center justify-between">
         <span className="font-display text-sm font-semibold text-ink">People nearby</span>
-        <span className="text-xs text-muted">
-          {people.filter((p) => Date.now() - new Date(p.last_seen).getTime() < 5 * 60 * 1000).length}{" "}
-          online
+        <span className="text-xs text-muted flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-green inline-block" />
+          {onlineOnly.length} online
         </span>
       </div>
 
       <div className="px-[18px] flex flex-col gap-2.5">
         {filtered.length === 0 && (
-          <p className="text-center text-muted text-sm py-8">No one matches your search yet.</p>
+          <p className="text-center text-muted text-sm py-8">
+            No one's online nearby right now — check back soon.
+          </p>
         )}
         {filtered.map((p) => (
           <PersonCard
