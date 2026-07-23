@@ -1,0 +1,37 @@
+{
+  "name": "LocalConnect",
+  "short_name": "LocalConnect",
+  "description": "Meet, chat, and connect with people near you.",
+  "start_url": "/people",
+  "id": "/people",
+  "display": "standalone",
+  "background_color": "#F4F3FF",
+  "theme_color": "#5B4FE8",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
